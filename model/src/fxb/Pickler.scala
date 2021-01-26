@@ -18,6 +18,8 @@ package fxb
 import upickle.AttributeTagged
 import upickle.core.Util
 
+import scala.util.Try
+
 object Pickler extends AttributeTagged {
 
   override implicit def OptionWriter[T](implicit
@@ -46,7 +48,7 @@ object Pickler extends AttributeTagged {
     }
 
     override def visitString(s: CharSequence, index: Int): Int =
-      s.toString.toInt
+      Try{s.toString.toInt}.getOrElse(Int.MinValue)
   }
 
 }
