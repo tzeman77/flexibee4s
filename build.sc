@@ -152,15 +152,33 @@ object model extends Common {
        |case class $cls(
        |${d.property map fld2src mkString ",\n"}
        |)
-       |""".stripMargin
+       |
+       |case class ${cls}W(winstrom: ${cls}W.Inner)
+       |object ${cls}W {
+       |  case class Inner(${d.tagName}: Seq[$cls])
+       |}""".stripMargin
   }
 
   override def generatedSources: Sources = T.sources{
     val d = T.ctx.dest
-    entities() foreach { e =>
+    val l = entities()
+    l.foreach { e =>
       os.write(d / s"${capitalizeFirst(e)}.scala",
         generateEvidenceModel(readEvidence(e)))
     }
+    val picklers = l map { e =>
+      val cls = capitalizeFirst(e)
+      s"""implicit def rw$cls: ReadWriter[$cls] = macroRW
+         |implicit def rw${cls}W: ReadWriter[${cls}W] = macroRW
+         |implicit def rw${cls}WI: ReadWriter[${cls}W.Inner] = macroRW
+         |""".stripMargin
+    }
+    os.write(d / "package.scala",
+      s"""import _root_.fxb.Pickler._
+         |
+         |package object fxb {
+         |${picklers mkString "\n"}
+         |}""".stripMargin)
     Seq(PathRef(d))
   }
 
