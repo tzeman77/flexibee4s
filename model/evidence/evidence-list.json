@@ -1078,7 +1078,7 @@
         "formCode": "cisClenDph",
         "extIdSupported": "false",
         "dbName": "uClenDph",
-        "evidenceFilter": "(PlatiOd <= 2021 AND PlatiDo >= 2021) AND IdStatu IN (39)"
+        "evidenceFilter": "(PlatiOd <= 2021 AND PlatiDo >= 2021) AND IdStatu IN (39,124)"
       },
       {
         "evidenceType": "CLEN_KON_VYK_DPH",
@@ -1089,7 +1089,7 @@
         "formCode": "cisClenKonVykDph",
         "extIdSupported": "false",
         "dbName": "uClenKonVykDph",
-        "evidenceFilter": "IdStatu IN (39)"
+        "evidenceFilter": "IdStatu IN (39,124)"
       },
       {
         "evidenceType": "UCETNI_OSNOVA",
@@ -2050,6 +2050,15 @@
         "extIdSupported": "false"
       },
       {
+        "evidenceType": "SOUHRNNE_HLASENI",
+        "evidenceName": "Souhrnné hlášení k DPH",
+        "evidencePath": "souhrnne-hlaseni-dph",
+        "importStatus": "DISALLOWED",
+        "className": "cz.winstrom.vo.vyk.SouhrnneHlaseni",
+        "formCode": "vykazSouhrnneHlaseni",
+        "extIdSupported": "false"
+      },
+      {
         "evidenceType": "ANALYZA_ZAKAZKY",
         "evidenceName": "Účetní analýza zakázky",
         "evidencePath": "analyza-zakazky",
@@ -2095,6 +2104,15 @@
         "extIdSupported": "false"
       },
       {
+        "evidenceType": "VYSLEDOVKA_PO_UCTECH",
+        "evidenceName": "Soupis nákladů a výnosů",
+        "evidencePath": "vysledovka-po-uctech",
+        "importStatus": "DISALLOWED",
+        "className": "cz.winstrom.vo.vyk.StavyUctu",
+        "formCode": "vykazVysledovkaPoUctech",
+        "extIdSupported": "false"
+      },
+      {
         "evidenceType": "CENIKOVE_POHYBY_NAKUP",
         "evidenceName": "Nákupní, prodejní a skladové pohyby",
         "evidencePath": "cenikovy-pohyb-nakup",
@@ -2122,6 +2140,15 @@
         "extIdSupported": "false"
       },
       {
+        "evidenceType": "PO_SPLATNOSTI",
+        "evidenceName": "Neuhrazené pohledávky/závazky po splatnosti",
+        "evidencePath": "po-splatnosti",
+        "importStatus": "DISALLOWED",
+        "className": "cz.winstrom.vo.vyk.PoSplatnosti",
+        "formCode": "vykazPoSplatnostiWizard",
+        "extIdSupported": "false"
+      },
+      {
         "evidenceType": "SALDO_K_DATU",
         "evidenceName": "Stav úhrad k datu",
         "evidencePath": "saldo-k-datu",
@@ -2129,6 +2156,27 @@
         "className": "cz.winstrom.vo.vyk.SaldoKdatu",
         "formCode": "vykazSaldoKdatu",
         "extIdSupported": "false"
+      },
+      {
+        "evidenceType": "SESTAVA",
+        "evidenceName": "Seznam sestav",
+        "evidencePath": "sestava",
+        "importStatus": "DISALLOWED",
+        "className": "cz.winstrom.vo.uses.Sestava",
+        "formCode": "uSestavy",
+        "extIdSupported": "false",
+        "dbName": "uSestavy",
+        "evidenceFilter": "PlatiOd <= 2021 AND PlatiDo >= 2021"
+      },
+      {
+        "evidenceType": "RADEK_SESTAVY",
+        "evidenceName": "Řádek sestavy",
+        "evidencePath": "radek-sestavy",
+        "importStatus": "DISALLOWED",
+        "className": "cz.winstrom.vo.uses.Radek",
+        "formCode": "uSesRadky",
+        "extIdSupported": "false",
+        "dbName": "uSesRadky"
       },
       {
         "evidenceType": "SUBJEKT",
