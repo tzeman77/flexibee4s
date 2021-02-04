@@ -58,7 +58,7 @@ trait Common extends ScalaModule with PublishModule {
 
   override def scalaVersion: T[String] = V.scala213
 
-  override def artifactName = "flexibee4s" 
+  override def artifactName = s"flexibee4s-${super.artifactName()}"
 
   override def publishVersion: T[String] = V.app
 
