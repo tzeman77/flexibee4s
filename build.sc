@@ -20,12 +20,11 @@ import upickle.default._
 val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
-  val app = "0.1-SNAPSHOT"
+  val app = "0.1"
   val scala213 = "2.13.4"
 }
 
 object D {
-  //val ujson = ivy"com.lihaoyi::ujson::1.2.2"
   val upickle = ivy"com.lihaoyi::upickle::1.2.2"
 }
 
@@ -231,6 +230,15 @@ object model extends Common {
   }
 
   override def ivyDeps: T[Loose.Agg[Dep]] = Agg(D.upickle)
+}
+
+def publishLocal(): Command[Unit] = T.command{
+  model.publishLocal()()
+}
+
+def publishM2Local(p: os.Path): Command[Unit] = T.command{
+  model.publishM2Local(p.toString)()
+  ()
 }
 
 // vim: et ts=2 sw=2 syn=scala
