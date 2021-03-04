@@ -3,3 +3,4 @@
 out/
 .idea
 .idea_modules
+.direnv/
