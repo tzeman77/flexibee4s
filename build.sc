@@ -12,6 +12,7 @@
 import mill._
 import mill.api.Loose
 import mill.define.{Command, Sources}
+import mill.scalajslib.ScalaJSModule
 import mill.scalalib._
 import mill.scalalib.publish._
 import upickle.default._
@@ -20,8 +21,9 @@ import upickle.default._
 val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
-  val app = "0.1"
-  val scala213 = "2.13.4"
+  val app = "0.2-SNAPSHOT"
+  val scala213 = "2.13.5"
+  val scalaJs = "1.5.0"
 }
 
 object D {
@@ -57,11 +59,16 @@ trait Common extends ScalaModule with PublishModule {
 
   override def scalaVersion: T[String] = V.scala213
 
-  override def artifactName = s"flexibee4s-${super.artifactName()}"
+  override def artifactName: T[String] =
+  s"flexibee4s-${super.artifactName()}".stripSuffix("-jvm").stripSuffix("-js")
 
   override def publishVersion: T[String] = V.app
 
   override def scalacOptions = T{compilerOptions}
+
+  override def sources: Sources = T.sources {
+    super.sources() :+ PathRef(millSourcePath / 'shared)
+  }
 
 }
 
@@ -85,13 +92,14 @@ object EvidenceDescriptor {
   }
 }
 
-object model extends Common {
+trait Model extends Common {
 
   def entities = T{Seq("adresar", "smlouva", "faktura-vydana", "pohledavka",
     "stitek", "skupina-stitku")}
 
   private val evidenceList = "evidence-list"
-  private val evidenceDir = millSourcePath / 'evidence
+  private val evidenceDir = millSourcePath / os.up / 'evidence
+  val classBreakpoint = 64
 
   private def downloadJson(path: String): ujson.Value =
     ujson.read(requests.get(s"$baseUrl/$path.json").text)
@@ -126,7 +134,7 @@ object model extends Common {
 
   def generateEvidenceModel(ed: EvidenceDescriptor): String = {
 
-    def fldType(fd: FieldDescriptor): String = {
+    def fldType(fd: FieldDescriptor, mkDefault: Boolean = false): String = {
       val t = fd.`type` match {
         case "string" | "date" | "datetime" => "String"
         case "integer" => "Int"
@@ -135,7 +143,8 @@ object model extends Common {
       }
       fd.mandatory match {
         case "true" => t
-        case _ => s"Option[$t] = None"
+        case _ if mkDefault => s"Option[$t] = None"
+        case _ => s"Option[$t]"
       }
     }
 
@@ -144,13 +153,30 @@ object model extends Common {
          |  /** Name: ${fd.name}.
          |   *  Title: ${fd.title}.
          |   *  Type: ${fd.`type`}, mandatory: ${fd.mandatory}.*/
-         |  ${fd.propertyName}: ${fldType(fd)}""".stripMargin
+         |  val ${fd.propertyName}: ${fldType(fd, mkDefault = true)}""".stripMargin
+
+    def fld2desc(fd: FieldDescriptor): String =
+      s"""  val ${fd.propertyName}: FieldDescriptor[${fldType(fd)}] =
+         |    FieldDescriptor[${fldType(fd)}](
+         |      propertyName = "${fd.propertyName}",
+         |      name = "${fd.name}",
+         |      title = "${fd.title}",
+         |      `type` = "${fd.`type`}",
+         |      mandatory = ${"true" == fd.mandatory}
+         |    )""".stripMargin
+
+    val extendsEvidenceDescriptor =
+      s"""EvidenceDescriptor(
+         |  evidenceName = "${ed.properties.evidenceName}",
+         |  tagName = "${ed.properties.tagName}",
+         |  dbName = "${ed.properties.dbName}"
+         |)""".stripMargin
 
     val d = ed.properties
     val cls = pascalCase(d.tagName)
-    val tooBig = d.property.length > 64
+    val tooBig = d.property.length > classBreakpoint
 
-    val groups = d.property.grouped(64).toList.zipWithIndex
+    val groups = d.property.grouped(classBreakpoint).toList.zipWithIndex
 
     val parts = if (tooBig) {
       groups map { case (grp, i) =>
@@ -167,8 +193,8 @@ object model extends Common {
     } else Seq()
 
     val companion = if (tooBig) {
-      s"""object $cls {
-         |  def apply(${groups map(_._2) map(i => s"p$i: $cls$i") mkString ", "}): $cls = $cls(
+      s"""object $cls extends $extendsEvidenceDescriptor {
+         |  def apply(${groups map(_._2) map(i => s"p$i: $cls$i") mkString ", "}): $cls = new $cls(
          |${groups flatMap { case (grp, i) => grp map { fld =>
         s"    ${fld.propertyName} = p$i.${fld.propertyName}"}} mkString ",\n" }
          |  )
@@ -177,12 +203,16 @@ object model extends Common {
          |${groups map { case (_, i) =>
         s"    Pickler.read[$cls$i](js)"} mkString ",\n"}
          |  )
+         |
+         |${d.property map fld2desc mkString "\n\n"}
          |}
          |""".stripMargin
     } else
       s"""
-         |object $cls {
+         |object $cls extends $extendsEvidenceDescriptor {
          |  implicit val rw: ReadWriter[$cls] = macroRW
+         |
+         |${d.property map fld2desc mkString "\n\n"}
          |}
          |""".stripMargin
 
@@ -197,7 +227,7 @@ object model extends Common {
        | * Evidence: ${d.evidenceName}.
        | * dbName: ${d.dbName}
        | */
-       |case class $cls(
+       |${if (tooBig) "" else "case "}class $cls(
        |${d.property map fld2src mkString ",\n"}
        |)
        |
@@ -232,12 +262,24 @@ object model extends Common {
   override def ivyDeps: T[Loose.Agg[Dep]] = Agg(D.upickle)
 }
 
+object model extends Module {
+
+  object jvm extends Model
+
+  object js extends Model with ScalaJSModule {
+    override def scalaJSVersion: T[String] = V.scalaJs
+  }
+
+}
+
 def publishLocal(): Command[Unit] = T.command{
-  model.publishLocal()()
+  model.jvm.publishLocal()()
+  model.js.publishLocal()()
 }
 
 def publishM2Local(p: os.Path): Command[Unit] = T.command{
-  model.publishM2Local(p.toString)()
+  model.jvm.publishM2Local(p.toString)()
+  model.js.publishLocal()()
   ()
 }
 
