@@ -21,13 +21,13 @@ import upickle.default._
 val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
-  val app = "0.2"
-  val scala213 = "2.13.5"
-  val scalaJs = "1.5.0"
+  val app = "0.2.1-SNAPSHOT"
+  val scala213 = "2.13.6"
+  val scalaJs = "1.5.1"
 }
 
 object D {
-  val upickle = ivy"com.lihaoyi::upickle::1.2.2"
+  val upickle = ivy"com.lihaoyi::upickle::1.4.0"
 }
 
 val compilerOptions = Seq(
