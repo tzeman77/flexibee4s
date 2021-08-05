@@ -279,7 +279,7 @@ def publishLocal(): Command[Unit] = T.command{
 
 def publishM2Local(p: os.Path): Command[Unit] = T.command{
   model.jvm.publishM2Local(p.toString)()
-  model.js.publishLocal()()
+  model.js.publishM2Local(p.toString)()
   ()
 }
 
