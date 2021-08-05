@@ -21,7 +21,7 @@ import upickle.default._
 val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
-  val app = "0.2.1-SNAPSHOT"
+  val app = "0.2.1"
   val scala213 = "2.13.6"
   val scalaJs = "1.5.1"
 }
