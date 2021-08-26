@@ -1,7 +1,7 @@
 /*
  * REPL:
  *
- * ./mill --repl -w
+ * JAVA_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MetaspaceSize=2G -Xmx2G -Xss32M" ./mill --repl -w
  *
  * Generate Idea project:
  *
@@ -99,7 +99,7 @@ trait Model extends Common {
 
   private val evidenceList = "evidence-list"
   private val evidenceDir = millSourcePath / os.up / 'evidence
-  val classBreakpoint = 64
+  val classBreakpoint = 200
 
   private def downloadJson(path: String): ujson.Value =
     ujson.read(requests.get(s"$baseUrl/$path.json").text)
