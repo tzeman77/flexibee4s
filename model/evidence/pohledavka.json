@@ -3306,7 +3306,7 @@
         "showToUser": "true",
         "propertyName": "sumCelkemBezZaloh",
         "dbName": "sumCelkem + sumZalohy",
-        "name": "Celkem bez záloh [€]",
+        "name": "Celkem bez záloh [Kč]",
         "title": "Celkem bez záloh",
         "type": "numeric",
         "isVisible": "true",

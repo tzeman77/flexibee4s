@@ -94,8 +94,17 @@ object EvidenceDescriptor {
 
 trait Model extends Common {
 
-  def entities = T{Seq("adresar", "smlouva", "faktura-vydana", "pohledavka",
-    "stitek", "skupina-stitku")}
+  def entities = T{Seq(
+    "adresar",
+    "faktura-vydana",
+    "pohledavka",
+    "skupina-stitku",
+    "smlouva",
+    "smlouva-polozka",
+    "stav-smlouvy",
+    "stitek",
+    "typ-smlouvy"
+  )}
 
   private val evidenceList = "evidence-list"
   private val evidenceDir = millSourcePath / os.up / 'evidence
