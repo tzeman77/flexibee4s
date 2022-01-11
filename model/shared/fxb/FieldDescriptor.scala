@@ -15,10 +15,17 @@
  */
 package fxb
 
+import fxb.FieldDescriptor.Value
+
 case class FieldDescriptor[T](
   propertyName: String,
   name: String,
   title: String,
   `type`: String,
-  mandatory: Boolean
+  mandatory: Boolean,
+  values: Seq[Value]
 )
+
+object FieldDescriptor {
+  case class Value(key: String, v: String)
+}

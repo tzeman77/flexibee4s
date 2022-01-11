@@ -73,10 +73,27 @@ trait Common extends ScalaModule with PublishModule {
 }
 
 case class FieldDescriptor(propertyName: String, name: String, title: String,
-  `type`: String, mandatory: String)
+  `type`: String, mandatory: String,
+  values: FieldDescriptor.Values = FieldDescriptor.Values(Seq.empty))
 
 object FieldDescriptor {
+
+  import upickle.implicits.key
+
   implicit val rw: ReadWriter[FieldDescriptor] = macroRW[FieldDescriptor]
+
+  case class Values(value: Seq[Value])
+
+  object Values {
+    implicit val rw: ReadWriter[Values] = macroRW
+  }
+
+  case class Value(@key("@key") key: String, @key("$") v: String)
+
+  object Value {
+    implicit val rw: ReadWriter[Value] = macroRW
+  }
+
 }
 
 case class EvidenceDescriptor(properties: EvidenceDescriptor.Inner)
@@ -164,6 +181,10 @@ trait Model extends Common {
          |   *  Type: ${fd.`type`}, mandatory: ${fd.mandatory}.*/
          |  val ${fd.propertyName}: ${fldType(fd, mkDefault = true)}""".stripMargin
 
+    def fld2values(fd: FieldDescriptor): String = fd.values.value map(v =>
+      s"""Value("${v.key}", "${v.v.replaceAll("\"", "'")}")"""
+      ) mkString("Seq(", ", ", ")")
+
     def fld2desc(fd: FieldDescriptor): String =
       s"""  val ${fd.propertyName}: FieldDescriptor[${fldType(fd)}] =
          |    FieldDescriptor[${fldType(fd)}](
@@ -171,7 +192,8 @@ trait Model extends Common {
          |      name = "${fd.name}",
          |      title = "${fd.title}",
          |      `type` = "${fd.`type`}",
-         |      mandatory = ${"true" == fd.mandatory}
+         |      mandatory = ${"true" == fd.mandatory},
+         |      values = ${fld2values(fd)}
          |    )""".stripMargin
 
     val extendsEvidenceDescriptor =
@@ -230,6 +252,7 @@ trait Model extends Common {
        |
        |package fxb
        |
+       |import FieldDescriptor.Value
        |import Pickler._
        |
        |/**
