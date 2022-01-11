@@ -1,0 +1,3 @@
+-XX:MaxMetaspaceSize=2G
+-Xmx2G
+-Xss32M
