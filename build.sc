@@ -114,13 +114,16 @@ trait Model extends Common {
   def entities = T{Seq(
     "adresar",
     "faktura-vydana",
+    "konst-symbol",
     "pohledavka",
     "skupina-stitku",
     "smlouva",
     "smlouva-polozka",
     "stav-smlouvy",
     "stitek",
-    "typ-smlouvy"
+    "stredisko",
+    "typ-smlouvy",
+    "zakazka"
   )}
 
   private val evidenceList = "evidence-list"
