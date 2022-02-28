@@ -23,9 +23,7 @@ case class Response(
   success: String,
   message: Option[String] = None,
   stats: Option[Stats] = None,
-  results: Seq[Result] = Seq.empty,
-
-)
+  results: Seq[Result] = Seq.empty)
 
 object Response {
   implicit val rw: ReadWriter[Response] = macroRW
@@ -37,12 +35,12 @@ object Response {
   }
 
   case class Err(
-    `for`: String,
-    code: String,
-    path: String,
-    value: String,
-    message: String
-  )
+    `for`: String = "",
+    code: String = "",
+    path: String = "",
+    value: String = "",
+    message: String = "")
+
   object Err {
     implicit val rw: ReadWriter[Err] = macroRW
   }
