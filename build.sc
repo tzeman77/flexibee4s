@@ -113,6 +113,7 @@ trait Model extends Common {
 
   def entities = T{Seq(
     "adresar",
+    "cenik",
     "faktura-vydana",
     "konst-symbol",
     "pohledavka",
