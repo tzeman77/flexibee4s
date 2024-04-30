@@ -11,7 +11,7 @@
 
 import mill._
 import mill.api.Loose
-import mill.define.{Command, Sources}
+import mill.define.Command
 import mill.scalajslib.ScalaJSModule
 import mill.scalalib._
 import mill.scalalib.publish._
@@ -22,12 +22,12 @@ val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
   val app = "0.3-SNAPSHOT"
-  val scala213 = "2.13.6"
-  val scalaJs = "1.5.1"
+  val scala213 = "2.13.14"
+  val scalaJs = "1.16.0"
 }
 
 object D {
-  val upickle = ivy"com.lihaoyi::upickle::1.4.0"
+  val upickle = ivy"com.lihaoyi::upickle::2.0.0"
 }
 
 val compilerOptions = Seq(
@@ -41,7 +41,7 @@ val compilerOptions = Seq(
     "-language:postfixOps",
     "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
     "-Xcheckinit",                       // Wrap field accessors to throw an exception on uninitialized access.
-    "-target:jvm-1.8"
+    "-release:8"
   )
 
 trait Common extends ScalaModule with PublishModule {
@@ -66,8 +66,8 @@ trait Common extends ScalaModule with PublishModule {
 
   override def scalacOptions = T{compilerOptions}
 
-  override def sources: Sources = T.sources {
-    super.sources() :+ PathRef(millSourcePath / 'shared)
+  override def sources: T[Seq[PathRef]] = T.sources {
+    super.sources() :+ PathRef(millSourcePath / "shared")
   }
 
 }
@@ -128,11 +128,11 @@ trait Model extends Common {
   )}
 
   private val evidenceList = "evidence-list"
-  private val evidenceDir = millSourcePath / os.up / 'evidence
+  private val evidenceDir = millSourcePath / os.up / "evidence"
   val classBreakpoint = 200
 
   private def downloadJson(path: String): ujson.Value =
-    ujson.read(requests.get(s"$baseUrl/$path.json").text)
+    ujson.read(requests.get(s"$baseUrl/$path.json").text())
 
   private def downloadEvidenceProperties(entity: String): ujson.Value = {
     downloadJson(s"$entity/properties")
@@ -141,6 +141,7 @@ trait Model extends Common {
   def pascalCase(s: String): String = s.split("-").map(
     _.toList match {
       case first :: rest => (first.toUpper :: rest).mkString
+      case Nil => ""
     }).mkString
 
   def escapeIdent(s: String): String =
@@ -148,6 +149,7 @@ trait Model extends Common {
 
   def camelCase(s: String): String = pascalCase(s).toList match {
     case first :: rest => (first.toLower :: rest).mkString
+    case Nil => ""
   }
 
   def refreshEvidences(): Command[Unit] = T.command{
@@ -285,8 +287,8 @@ trait Model extends Common {
        |""".stripMargin
   }
 
-  override def generatedSources: Sources = T.sources{
-    val d = T.ctx.dest
+  override def generatedSources: T[Seq[PathRef]] = T.sources{
+    val d = T.ctx().dest
     val l = entities()
     l.foreach { e =>
       os.write(d / s"${pascalCase(e)}.scala",
@@ -313,9 +315,9 @@ def publishLocal(): Command[Unit] = T.command{
   model.js.publishLocal()()
 }
 
-def publishM2Local(p: os.Path): Command[Unit] = T.command{
-  model.jvm.publishM2Local(p.toString)()
-  model.js.publishM2Local(p.toString)()
+def publishM2Local(p: String): Command[Unit] = T.command{
+  model.jvm.publishM2Local(p)()
+  model.js.publishM2Local(p)()
   ()
 }
 
