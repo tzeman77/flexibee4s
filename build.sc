@@ -22,12 +22,12 @@ val baseUrl = "https://demo.flexibee.eu/c/demo"
 
 object V {
   val app = "0.3-SNAPSHOT"
-  val scala213 = "2.13.6"
-  val scalaJs = "1.5.1"
+  val scala213 = "2.13.14"
+  val scalaJs = "1.16.0"
 }
 
 object D {
-  val upickle = ivy"com.lihaoyi::upickle::1.4.0"
+  val upickle = ivy"com.lihaoyi::upickle::3.3.0"
 }
 
 val compilerOptions = Seq(
@@ -41,7 +41,7 @@ val compilerOptions = Seq(
     "-language:postfixOps",
     "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
     "-Xcheckinit",                       // Wrap field accessors to throw an exception on uninitialized access.
-    "-target:jvm-1.8"
+    "-release:8"
   )
 
 trait Common extends ScalaModule with PublishModule {

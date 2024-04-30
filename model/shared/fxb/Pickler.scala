@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Tomas Zeman <tomas@functionals.cz>
+ * Copyright 2021-2024 Tomas Zeman <tomas@functionals.cz>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package fxb
 
 import upickle.AttributeTagged
-import upickle.core.Util
+import upickle.core.ParseUtils
 
 import scala.util.Try
 
@@ -44,7 +44,7 @@ object Pickler extends AttributeTagged {
     override def visitFloat64(d: Double, index: Int): Int = d.toInt
     override def visitFloat64StringParts(s: CharSequence, decIndex: Int,
       expIndex: Int, index: Int): Int = {
-      Util.parseIntegralNum(s, decIndex, expIndex, index).toInt
+      ParseUtils.parseIntegralNum(s, decIndex, expIndex, index).toInt
     }
 
     override def visitString(s: CharSequence, index: Int): Int =
