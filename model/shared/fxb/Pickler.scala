@@ -16,7 +16,7 @@
 package fxb
 
 import upickle.AttributeTagged
-import upickle.core.ParseUtils
+import upickle.core.Util
 
 import scala.util.Try
 
@@ -44,7 +44,7 @@ object Pickler extends AttributeTagged {
     override def visitFloat64(d: Double, index: Int): Int = d.toInt
     override def visitFloat64StringParts(s: CharSequence, decIndex: Int,
       expIndex: Int, index: Int): Int = {
-      ParseUtils.parseIntegralNum(s, decIndex, expIndex, index).toInt
+      Util.parseIntegralNum(s, decIndex, expIndex, index).toInt
     }
 
     override def visitString(s: CharSequence, index: Int): Int =

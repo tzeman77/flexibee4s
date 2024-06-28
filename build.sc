@@ -27,7 +27,7 @@ object V {
 }
 
 object D {
-  val upickle = ivy"com.lihaoyi::upickle::3.3.0"
+  val upickle = ivy"com.lihaoyi::upickle::2.0.0"
 }
 
 val compilerOptions = Seq(
